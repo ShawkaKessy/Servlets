@@ -1,4 +1,5 @@
 package ru.netology.repository;
+import org.springframework.stereotype.Component;
 
 import ru.netology.model.Post;
 
@@ -6,7 +7,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-// Stub
+
+@Component
 public class PostRepository {
   public List<Post> all() {
     return Collections.emptyList();
