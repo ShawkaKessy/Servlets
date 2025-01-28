@@ -20,13 +20,17 @@ public class MainServlet extends HttpServlet {
   @Override
   protected void service(HttpServletRequest req, HttpServletResponse resp) {
     try {
+
       final var path = req.getRequestURI();
-      final var method = req.getMethod();if (method.equals("GET") && path.equals("/api/posts")) {
+      final var method = req.getMethod();
+
+      if (method.equals("GET") && path.equals("/api/posts")) {
         controller.all(resp);
         return;
       }
       if (method.equals("GET") && path.matches("/api/posts/\\d+")) {
-        final var id = Long.parseLong(path.substring(path.lastIndexOf("/") + 1));
+
+        final var id = Long.parseLong(path.substring(path.lastIndexOf("/")));
         controller.getById(id, resp);
         return;
       }
@@ -35,7 +39,8 @@ public class MainServlet extends HttpServlet {
         return;
       }
       if (method.equals("DELETE") && path.matches("/api/posts/\\d+")) {
-        final var id = Long.parseLong(path.substring(path.lastIndexOf("/") + 1));
+
+        final var id = Long.parseLong(path.substring(path.lastIndexOf("/")));
         controller.removeById(id, resp);
         return;
       }
