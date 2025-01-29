@@ -1,37 +1,40 @@
 package ru.netology.servlet;
 
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 import ru.netology.controller.PostController;
-import ru.netology.repository.PostRepository;
-import ru.netology.service.PostService;
 
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
+@ComponentScan("ru.netology")
 public class MainServlet extends HttpServlet {
   private PostController controller;
 
   @Override
-  public void init() {
-    final var repository = new PostRepository();
-    final var service = new PostService(repository);
-    controller = new PostController(service);
+  public void init(ServletConfig config) throws ServletException {
+    super.init(config);
+
+    SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(this);
   }
 
   @Override
   protected void service(HttpServletRequest req, HttpServletResponse resp) {
-    // если деплоились в root context, то достаточно этого
     try {
       final var path = req.getRequestURI();
       final var method = req.getMethod();
-      // primitive routing
+
       if (method.equals("GET") && path.equals("/api/posts")) {
         controller.all(resp);
         return;
       }
       if (method.equals("GET") && path.matches("/api/posts/\\d+")) {
-        // easy way
-        final var id = Long.parseLong(path.substring(path.lastIndexOf("/")));
+        final var id = Long.parseLong(path.substring(path.lastIndexOf("/") + 1));
         controller.getById(id, resp);
         return;
       }
@@ -40,8 +43,7 @@ public class MainServlet extends HttpServlet {
         return;
       }
       if (method.equals("DELETE") && path.matches("/api/posts/\\d+")) {
-        // easy way
-        final var id = Long.parseLong(path.substring(path.lastIndexOf("/")));
+        final var id = Long.parseLong(path.substring(path.lastIndexOf("/") + 1));
         controller.removeById(id, resp);
         return;
       }
@@ -52,4 +54,3 @@ public class MainServlet extends HttpServlet {
     }
   }
 }
-
