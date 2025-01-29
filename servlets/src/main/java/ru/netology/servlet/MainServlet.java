@@ -1,27 +1,35 @@
 package ru.netology.servlet;
 
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import ru.netology.config.AppConfig;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 import ru.netology.controller.PostController;
 
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
+@ComponentScan("ru.netology")
 public class MainServlet extends HttpServlet {
   private PostController controller;
 
   @Override
-  public void init() {
-    var context = new AnnotationConfigApplicationContext(AppConfig.class);
-    controller = context.getBean(PostController.class);
+  public void init(ServletConfig config) throws ServletException {
+    super.init(config);
+
+    SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(this);
   }
 
   @Override
   protected void service(HttpServletRequest req, HttpServletResponse resp) {
     try {
       final var path = req.getRequestURI();
-      final var method = req.getMethod();if (method.equals("GET") && path.equals("/api/posts")) {
+      final var method = req.getMethod();
+
+      if (method.equals("GET") && path.equals("/api/posts")) {
         controller.all(resp);
         return;
       }
